@@ -1,0 +1,243 @@
+---
+/**
+ * BASE LAYOUT — Livoltek Africa
+ * ===============================
+ *
+ * This single file replaces FIVE things from the old React SPA:
+ *   1. Layout.tsx (page shell with Header/Footer)
+ *   2. SEOHead (imperative DOM meta tag upserts → now declarative <head>)
+ *   3. vite-plugin-og-tags.ts (build-time OG injection → now native)
+ *   4. inject-og-tags.mjs (per-route OG replacement → now per-page props)
+ *   5. GTM + Consent Mode v2 injection (now static HTML in <head>)
+ *
+ * Every public page passes SEO props to this layout. Astro renders them
+ * into static HTML at build time — crawlers get perfect meta tags with
+ * ZERO JavaScript execution required.
+ */
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import FloatingWhatsApp from '../components/FloatingWhatsApp.tsx';
+import CookieConsent from '../components/CookieConsent.tsx';
+import { companyInfo } from '../lib/mockData';
+
+import '../styles/global.css';
+
+// ─── SEO Props ─────────────────────────────────────────────────
+export interface Props {
+  title: string;
+  description: string;
+  keywords?: string;
+  canonicalPath?: string;
+  ogType?: string;
+  ogImage?: string;
+  ogImageAlt?: string;
+  article?: {
+    publishedTime?: string;
+    modifiedTime?: string;
+    author?: string;
+    section?: string;
+    tags?: string[];
+  };
+  noindex?: boolean;
+  /** JSON-LD structured data objects to inject */
+  jsonLd?: Record<string, unknown>[];
+}
+
+const {
+  title,
+  description,
+  keywords,
+  canonicalPath = '',
+  ogType = 'website',
+  ogImage,
+  ogImageAlt,
+  article,
+  noindex = false,
+  jsonLd = [],
+} = Astro.props;
+
+const fullTitle = title.includes('Livoltek') ? title : `${title} | Livoltek Africa`;
+const canonicalUrl = `${companyInfo.url}${canonicalPath}`;
+const imageUrl = ogImage || `${companyInfo.url}/images/og-default.jpg`;
+const imageAlt = ogImageAlt || fullTitle;
+const imageType = imageUrl.endsWith('.png') ? 'image/png' : 'image/jpeg';
+
+// GTM Container ID
+const GTM_ID = 'GTM-M68GMNKH';
+---
+
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+    {/* ─── Favicon ─────────────────────────────────────── */}
+    <link rel="icon" type="image/png" href="/images/livoltek-logo.png" />
+
+    {/* ─── Google Consent Mode v2 — MUST fire BEFORE GTM ─ */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+    </script>
+
+    {/* ─── Google Tag Manager ────────────────────────── */}
+    <script is:inline define:vars={{ GTM_ID }}>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer',GTM_ID);
+    </script>
+
+    {/* ─── Fonts ─────────────────────────────────────── */}
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    {/* ─── SEO: Title & Description ──────────────────── */}
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    {keywords && <meta name="keywords" content={keywords} />}
+    <link rel="canonical" href={canonicalUrl} />
+    <meta name="theme-color" content="#0C2340" />
+    <meta name="msapplication-TileColor" content="#0C2340" />
+    <meta http-equiv="content-language" content="en-za" />
+
+    {/* ─── Geo (local SEO) ──────────────────────────── */}
+    <meta name="geo.region" content="ZA-GP" />
+    <meta name="geo.placename" content="Johannesburg" />
+    <meta name="geo.position" content="-25.9862;28.1274" />
+    <meta name="ICBM" content="-25.9862, 28.1274" />
+
+    {/* ─── Robots ────────────────────────────────────── */}
+    {noindex ? (
+      <meta name="robots" content="noindex,nofollow" />
+    ) : (
+      <meta name="robots" content="index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1" />
+    )}
+
+    {/* ─── Open Graph ────────────────────────────────── */}
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonicalUrl} />
+    <meta property="og:image" content={imageUrl} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:type" content={imageType} />
+    <meta property="og:image:alt" content={imageAlt} />
+    <meta property="og:site_name" content={companyInfo.name} />
+    <meta property="og:locale" content="en_ZA" />
+
+    {/* ─── Author ──────────────────────────────────────── */}
+    {article?.author && <meta name="author" content={article.author} />}
+
+    {/* ─── Article-specific OG (insights, resources) ── */}
+    {article?.publishedTime && <meta property="article:published_time" content={article.publishedTime} />}
+    {article?.modifiedTime && <meta property="article:modified_time" content={article.modifiedTime} />}
+    {article?.author && <meta property="article:author" content={article.author} />}
+    {article?.section && <meta property="article:section" content={article.section} />}
+    {article?.tags?.map((tag) => (
+      <meta property="article:tag" content={tag} />
+    ))}
+
+    {/* ─── Twitter Card ──────────────────────────────── */}
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@livoltekAfrica" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={imageUrl} />
+
+    {/* ─── JSON-LD Structured Data ───────────────────── */}
+    {jsonLd.map((data) => (
+      <script type="application/ld+json" set:html={JSON.stringify(data)} />
+    ))}
+
+    {/* ─── Page-specific <head> content (slot) ───────── */}
+    <slot name="head" />
+  </head>
+
+  <body class="min-h-screen flex flex-col bg-background text-foreground" style="font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+    {/* ─── GTM noscript ──────────────────────────────── */}
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+        height="0"
+        width="0"
+        style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
+
+    {/* ─── Skip to content (WCAG 2.1) ────────────────── */}
+    <a
+      href="#main-content"
+      class="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:bg-[#009BFF] focus:text-white focus:px-4 focus:py-2 focus:rounded-lg focus:shadow-lg focus:outline-none"
+      style="font-weight: 600; font-size: 0.875rem;"
+    >
+      Skip to main content
+    </a>
+
+    <Header />
+
+    <main class="flex-1" id="main-content" role="main">
+      <slot />
+    </main>
+
+    {/* ─── Noscript fallback for crawlers ────────────── */}
+    <noscript>
+      <div style="padding: 2rem; max-width: 800px; margin: 0 auto; font-family: Inter, sans-serif;">
+        <h1>{companyInfo.name} — {companyInfo.tagline}</h1>
+        <p>{companyInfo.description}</p>
+        <p>
+          Contact: <a href={`mailto:${companyInfo.email}`}>{companyInfo.email}</a>
+          | <a href={`tel:${companyInfo.phone}`}>{companyInfo.phone}</a>
+        </p>
+        <nav>
+          <ul>
+            <li><a href="/">Home</a></li>
+            <li><a href="/products">Products</a></li>
+            <li><a href="/solutions">Solutions</a></li>
+            <li><a href="/insights">Insights</a></li>
+            <li><a href="/about">About Us</a></li>
+            <li><a href="/contact">Contact</a></li>
+          </ul>
+        </nav>
+      </div>
+    </noscript>
+
+    <Footer />
+
+    {/* ─── React Islands (client-side only) ──────────── */}
+    <CookieConsent client:idle />
+    <FloatingWhatsApp client:idle />
+
+    {/* ─── SPA page-view tracking for GTM ────────────── */}
+    <script is:inline>
+      // Track virtual page views on client-side navigation (View Transitions)
+      document.addEventListener('astro:page-load', function() {
+        if (window.dataLayer) {
+          window.dataLayer.push({
+            event: 'virtual_pageview',
+            page_path: window.location.pathname + window.location.search,
+            page_title: document.title
+          });
+        }
+      });
+    </script>
+  </body>
+</html>

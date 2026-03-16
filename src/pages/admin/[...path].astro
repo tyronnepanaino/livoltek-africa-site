@@ -1,0 +1,49 @@
+---
+/**
+ * ADMIN CATCH-ALL — Client-Only React Island
+ * =============================================
+ *
+ * The entire admin portal is a single React island mounted with
+ * client:only="react" — meaning ZERO server-side rendering.
+ * This is correct because:
+ *   1. Admin pages are noindexed (no SEO value)
+ *   2. They require Firebase Auth (client-side only)
+ *   3. They use Firestore real-time listeners (client-side only)
+ *   4. They have complex interactive UI (forms, drag-drop, etc.)
+ *
+ * The Astro page provides:
+ *   - A minimal static HTML shell with noindex
+ *   - GTM scripts (for internal analytics)
+ *   - The React island that renders the full admin UI
+ *
+ * MIGRATION NOTE:
+ *   Create an AdminApp.tsx that contains ALL the admin routing and UI.
+ *   This component receives the current URL path and handles its own
+ *   routing internally (using a simple switch or react-router).
+ *
+ * HOW IT WORKS:
+ *   - /admin → this page, path = undefined
+ *   - /admin/products → this page, path = "products"
+ *   - /admin/products/new → this page, path = "products/new"
+ *   - /admin/products/edit/abc → this page, path = "products/edit/abc"
+ *   etc.
+ *
+ * Astro generates a single admin page at build time. The React island
+ * handles all sub-routing on the client.
+ */
+import AdminLayout from '../../layouts/AdminLayout.astro';
+import AdminApp from '../../components/admin/AdminApp.tsx';
+
+// Static build requires getStaticPaths for dynamic routes.
+// We generate a single catch-all page — the React island handles all sub-routing client-side.
+export function getStaticPaths() {
+  return [{ params: { path: undefined } }];
+}
+
+// Capture the path for client-side routing
+const path = Astro.params.path || '';
+---
+
+<AdminLayout>
+  <AdminApp client:only="react" initialPath={`/admin/${path}`} />
+</AdminLayout>

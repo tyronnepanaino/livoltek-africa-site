@@ -1,0 +1,31 @@
+# Livoltek Africa — robots.txt
+User-agent: *
+Disallow: /admin/
+Allow: /
+
+# AI Search Engine Crawlers
+User-agent: GPTBot
+Allow: /
+Disallow: /admin/
+
+User-agent: Google-Extended
+Allow: /
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /admin/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /admin/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /admin/
+
+User-agent: Amazonbot
+Allow: /
+Disallow: /admin/
+
+# Sitemap
+Sitemap: https://www.livoltek.africa/sitemap-index.xml

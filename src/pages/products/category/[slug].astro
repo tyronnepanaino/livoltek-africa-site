@@ -1,0 +1,100 @@
+---
+/**
+ * PRODUCT CATEGORY PAGE — /products/category/[slug]
+ * ====================================================
+ *
+ * Generates a filtered product listing for each category.
+ * Categories are derived from published products at build time.
+ */
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { fetchProductsStatic } from '../../../lib/firestore-static';
+import { initialProducts, companyInfo } from '../../../lib/mockData';
+import { buildCollectionPageSchema, buildBreadcrumbSchema } from '../../../lib/schema';
+import type { Product } from '../../../lib/types';
+
+export async function getStaticPaths() {
+  function slugify(text: string): string {
+    return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+  }
+
+  let products: Product[];
+  try { products = await fetchProductsStatic(); } catch { products = initialProducts; }
+
+  const published = products.filter(p => p.status === 'published');
+  const categories = [...new Set(published.map(p => p.category))];
+
+  return categories.map(cat => ({
+    params: { slug: slugify(cat) },
+    props: {
+      categoryName: cat,
+      products: published.filter(p => p.category === cat),
+    },
+  }));
+}
+
+function slugify(text: string): string {
+  return text.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+}
+
+const { categoryName, products } = Astro.props as { categoryName: string; products: Product[] };
+const categorySlug = slugify(categoryName);
+
+const jsonLd = [
+  buildCollectionPageSchema(
+    `${categoryName} — Solar Products`,
+    `Browse Livoltek Africa's ${categoryName.toLowerCase()} range.`,
+    `${companyInfo.url}/products/category/${categorySlug}`
+  ),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Products', url: `${companyInfo.url}/products` },
+    { name: categoryName, url: `${companyInfo.url}/products/category/${categorySlug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  title={`${categoryName} — Commercial Solar Products`}
+  description={`Browse Livoltek Africa's range of ${categoryName.toLowerCase()} for commercial and industrial solar installations in Africa.`}
+  canonicalPath={`/products/category/${categorySlug}`}
+  jsonLd={jsonLd}
+>
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF]">Home</a></li>
+        <li>/</li>
+        <li><a href="/products" class="hover:text-[#009BFF]">Products</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">{categoryName}</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="bg-[#0C2340] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-white mb-4" style="font-size: 2.25rem; font-weight: 800;">{categoryName}</h1>
+      <p class="text-gray-300 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        Explore our {categoryName.toLowerCase()} designed for commercial and industrial solar installations.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-[#F5F7FA]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {products.map((product) => (
+          <a href={`/products/${product.slug}`} class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
+            <div class="aspect-[4/3] bg-[#F5F7FA] p-4">
+              <img src={product.image} alt={product.title} class="w-full h-full object-contain" loading="lazy" />
+            </div>
+            <div class="p-5">
+              <h3 class="text-[#0C2340] group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">{product.title}</h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">{product.shortDescription}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

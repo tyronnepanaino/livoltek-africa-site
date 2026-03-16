@@ -1,0 +1,119 @@
+---
+/**
+ * RESOURCE DETAIL PAGE — Dynamic Route
+ * ======================================
+ *
+ * Same pattern as products/[slug].astro and insights/[slug].astro.
+ *
+ * MIGRATION NOTE:
+ *   Copy the full JSX body from your existing ResourceDetailPage.tsx.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchResourcesStatic } from '../../lib/firestore-static';
+import { initialResources, companyInfo } from '../../lib/mockData';
+import { buildArticleSchema, buildBreadcrumbSchema } from '../../lib/schema';
+import type { Resource } from '../../lib/types';
+import { resourceTypeLabels } from '../../lib/types';
+
+export async function getStaticPaths() {
+  let resources: Resource[];
+  try {
+    resources = await fetchResourcesStatic();
+  } catch {
+    resources = initialResources;
+  }
+
+  return resources
+    .filter(r => r.status === 'published')
+    .map(resource => ({
+      params: { slug: resource.slug },
+      props: { resource },
+    }));
+}
+
+const { resource } = Astro.props as { resource: Resource };
+
+const jsonLd = [
+  buildArticleSchema(resource, 'resources'),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Resources', url: `${companyInfo.url}/resources` },
+    { name: resource.title, url: `${companyInfo.url}/resources/${resource.slug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  title={resource.metaTitle || resource.title}
+  description={resource.metaDescription || resource.excerpt}
+  canonicalPath={`/resources/${resource.slug}`}
+  ogType="article"
+  ogImage={resource.image}
+  ogImageAlt={resource.title}
+  article={{
+    publishedTime: resource.publishedAt,
+    modifiedTime: resource.updatedAt,
+    author: resource.author,
+    section: resource.category,
+    tags: resource.tags,
+  }}
+  jsonLd={jsonLd}
+>
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF]">Home</a></li>
+        <li>/</li>
+        <li><a href="/resources" class="hover:text-[#009BFF]">Resources</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">{resource.title}</li>
+      </ol>
+    </div>
+  </nav>
+
+  <article class="py-12 lg:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header class="mb-10">
+        <span class="text-[#009BFF]" style="font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;">
+          {resourceTypeLabels[resource.resourceType]}
+        </span>
+        <h1 class="text-[#0C2340] mt-2 mb-4" style="font-size: 2.25rem; font-weight: 700; line-height: 1.2;">
+          {resource.title}
+        </h1>
+        <div class="flex items-center gap-4 text-[#5A6A7E]" style="font-size: 0.875rem;">
+          <span>By {resource.author}</span>
+          {resource.readTime && <span>&middot; {resource.readTime}</span>}
+        </div>
+      </header>
+
+      <img src={resource.image} alt={resource.title} class="w-full rounded-2xl mb-10" loading="eager" />
+
+      {/* Download button for file resources */}
+      {resource.fileUrl && (
+        <div class="mb-10 p-6 bg-[#F5F7FA] rounded-xl flex items-center justify-between">
+          <div>
+            <p class="text-[#0C2340]" style="font-size: 1rem; font-weight: 600;">
+              {resource.fileName || 'Download Resource'}
+            </p>
+            {resource.fileSize && (
+              <p class="text-[#5A6A7E] mt-1" style="font-size: 0.875rem;">
+                {resource.fileSize}
+              </p>
+            )}
+          </div>
+          <a
+            href={resource.fileUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bg-[#009BFF] hover:bg-[#0080D9] text-white px-6 py-2.5 rounded-lg transition-colors"
+            style="font-size: 0.875rem; font-weight: 600;"
+          >
+            Download
+          </a>
+        </div>
+      )}
+
+      <div class="prose prose-lg max-w-none text-[#5A6A7E]" set:html={resource.content} />
+    </div>
+  </article>
+</BaseLayout>

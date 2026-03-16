@@ -1,0 +1,73 @@
+---
+/**
+ * ADMIN LAYOUT — Livoltek Africa
+ * ================================
+ *
+ * Minimal static shell for admin pages. The entire admin UI is a single
+ * React island mounted with client:only="react" — it handles its own
+ * routing, authentication, and Firestore real-time listeners.
+ *
+ * This layout:
+ *   - Sets noindex/nofollow (admin pages should never be indexed)
+ *   - Loads GTM (for internal analytics tracking)
+ *   - Does NOT include Header/Footer (admin has its own sidebar nav)
+ */
+
+const GTM_ID = 'GTM-M68GMNKH';
+
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en-ZA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex,nofollow" />
+    <title>Admin | Livoltek Africa</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+
+    {/* Consent Mode v2 defaults */}
+    <script is:inline>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('consent', 'default', {
+        'analytics_storage': 'denied',
+        'ad_storage': 'denied',
+        'ad_user_data': 'denied',
+        'ad_personalization': 'denied',
+        'functionality_storage': 'granted',
+        'personalization_storage': 'denied',
+        'security_storage': 'granted',
+        'wait_for_update': 500
+      });
+    </script>
+
+    {/* GTM */}
+    <script is:inline define:vars={{ GTM_ID }}>
+      (function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+      new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+      j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+      'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+      })(window,document,'script','dataLayer',GTM_ID);
+    </script>
+  </head>
+
+  <body class="min-h-screen bg-background text-foreground" style="font-family: 'Inter', system-ui, -apple-system, sans-serif;">
+    <noscript>
+      <iframe
+        src={`https://www.googletagmanager.com/ns.html?id=${GTM_ID}`}
+        height="0" width="0" style="display:none;visibility:hidden"
+      ></iframe>
+    </noscript>
+
+    {/* The admin React island fills the entire viewport */}
+    <slot />
+  </body>
+</html>

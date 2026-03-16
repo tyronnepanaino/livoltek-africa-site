@@ -1,0 +1,48 @@
+---
+/**
+ * QUOTE REQUEST PAGE
+ * ====================
+ *
+ * The quote form is a React island (complex multi-step form with
+ * cart/line items, validation, and Firestore submission).
+ *
+ * MIGRATION NOTE:
+ *   Extract the form logic from QuoteRequestPage.tsx into a
+ *   QuoteRequestForm.tsx React component and mount with client:load.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { companyInfo } from '../../lib/mockData';
+import { buildBreadcrumbSchema } from '../../lib/schema';
+// import QuoteRequestForm from '../../components/QuoteRequestForm.tsx';
+
+const jsonLd = [
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Contact', url: `${companyInfo.url}/contact` },
+    { name: 'Request a Quote', url: `${companyInfo.url}/contact/quote-request` },
+  ]),
+];
+---
+
+<BaseLayout
+  title="Request a Quote"
+  description="Request a free, no-obligation quote for commercial and industrial solar products and solutions from Livoltek Africa."
+  keywords="solar quote South Africa, commercial solar quote, C&I solar pricing"
+  canonicalPath="/contact/quote-request"
+  jsonLd={jsonLd}
+>
+  <section class="py-16">
+    <div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-[#0C2340] mb-4 text-center" style="font-size: 2.25rem; font-weight: 700;">
+        Request a Quote
+      </h1>
+      <p class="text-[#5A6A7E] text-center mb-10" style="font-size: 1.0625rem; line-height: 1.7;">
+        Tell us about your project and we'll provide a customised quote within 24 hours.
+      </p>
+
+      {/* MIGRATION TODO: Create QuoteRequestForm.tsx and mount here */}
+      {/* <QuoteRequestForm client:load /> */}
+      <p class="text-[#5A6A7E] italic text-center">Quote form — mount as React island with client:load</p>
+    </div>
+  </section>
+</BaseLayout>

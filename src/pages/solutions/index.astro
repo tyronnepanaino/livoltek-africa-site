@@ -1,0 +1,55 @@
+---
+/**
+ * SOLUTIONS LISTING PAGE
+ * ========================
+ * MIGRATION NOTE: Copy full JSX from SolutionsPage.tsx
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { solutions, companyInfo } from '../../lib/mockData';
+import { buildCollectionPageSchema, buildBreadcrumbSchema } from '../../lib/schema';
+
+const jsonLd = [
+  buildCollectionPageSchema('Solar Solutions', 'Commercial and industrial solar solutions for African businesses.', `${companyInfo.url}/solutions`),
+  buildBreadcrumbSchema([{ name: 'Home', url: companyInfo.url }, { name: 'Solutions', url: `${companyInfo.url}/solutions` }]),
+];
+---
+
+<BaseLayout
+  title="Commercial & Industrial Solar Solutions"
+  description="Comprehensive solar solutions for African businesses: rooftop solar, battery energy storage, EV charging infrastructure, and microgrid systems."
+  keywords="commercial solar solutions Africa, industrial solar, rooftop solar, BESS, EV charging, microgrids"
+  canonicalPath="/solutions"
+  jsonLd={jsonLd}
+>
+  <section class="bg-[#0C2340] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-white mb-4" style="font-size: 2.25rem; font-weight: 800;">Solar Solutions</h1>
+      <p class="text-gray-300 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        End-to-end solar energy solutions designed for Africa's commercial and industrial sector.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {solutions.map((solution) => (
+          <a href={`/solutions/${solution.slug}`} class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg border border-gray-100 transition-all">
+            <div class="aspect-[16/9]">
+              <img src={solution.image} alt={solution.title} class="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div class="p-6">
+              <h3 class="text-[#0C2340] group-hover:text-[#009BFF] transition-colors" style="font-size: 1.25rem; font-weight: 600;">{solution.title}</h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-3" style="font-size: 0.9375rem; line-height: 1.7;">{solution.shortDescription}</p>
+              <div class="mt-4 flex flex-wrap gap-2">
+                {solution.features.slice(0, 3).map((f) => (
+                  <span class="px-3 py-1 rounded-full bg-[#F5F7FA] text-[#5A6A7E]" style="font-size: 0.75rem;">{f}</span>
+                ))}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

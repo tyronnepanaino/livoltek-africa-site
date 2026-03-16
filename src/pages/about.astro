@@ -1,0 +1,195 @@
+---
+/**
+ * ABOUT PAGE — Full conversion from AboutPage.tsx
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { companyInfo, IMAGES } from '../lib/mockData';
+import { buildOrganizationSchema, buildBreadcrumbSchema, buildLocalBusinessSchema } from '../lib/schema';
+
+const jsonLd = [
+  buildOrganizationSchema(),
+  buildLocalBusinessSchema(),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: `${companyInfo.url}/` },
+    { name: 'About', url: `${companyInfo.url}/about` },
+  ]),
+];
+
+const timeline = [
+  { year: '2017', title: 'Founded in Johannesburg', desc: 'Livoltek South Africa was established to serve the growing Residential solar market across the region through Hexing Electrical SA (Pty) Ltd' },
+  { year: '2023', title: 'Electric Vehicle Charging Launch', desc: 'Livoltek South Africa introduced Residential Electric Vehicle charging stations.' },
+  { year: '2024', title: 'Pan-African Expansion', desc: 'Expanded operations to the SADC region with offices in Zambia & South Africa.' },
+  { year: '2025', title: 'Commercial & Industrial Focus', desc: "The company's management made the strategic decision to shift focus on Utility, Commercial and Industrial sectors" },
+  { year: '2026', title: 'Energy Storage Launch', desc: 'Introduced industrial & commercial battery energy storage systems to complement solar offerings.' },
+];
+
+const values = [
+  { title: 'Innovation', desc: 'We continuously push the boundaries of solar technology to deliver cutting-edge solutions.' },
+  { title: 'Sustainability', desc: "Every project contributes to Africa's clean energy transition and carbon reduction goals." },
+  { title: 'Excellence', desc: 'We maintain the highest standards in product quality, installation, and customer service.' },
+  { title: 'Partnership', desc: 'We build lasting relationships with clients, communities, and channel partners.' },
+];
+
+const stats = [
+  { value: companyInfo.mwInstalled, label: 'MW Installed Globally' },
+  { value: companyInfo.projectsCompleted, label: 'Product Installations' },
+  { value: companyInfo.countriesServed, label: 'African Countries' },
+  { value: companyInfo.employees, label: 'Solar Team Members' },
+];
+---
+
+<BaseLayout
+  title="About Livoltek Africa | Commercial & Industrial Solar Energy Leader"
+  description={`Learn about Livoltek Africa, a leading provider of commercial and industrial solar energy products and solutions. ${companyInfo.mwInstalled} MW installed across ${companyInfo.countriesServed} African countries.`}
+  keywords="about Livoltek Africa, commercial solar company, industrial solar provider, African solar energy, solar company South Africa"
+  canonicalPath="/about"
+  jsonLd={jsonLd}
+>
+  {/* Hero */}
+  <section class="relative bg-[#0C2340] py-20 md:py-28">
+    <div class="absolute inset-0">
+      <img src={IMAGES.team} alt="Livoltek Africa team of commercial solar energy professionals" class="w-full h-full object-cover opacity-20" loading="eager" width="1920" height="1080" />
+      <div class="absolute inset-0 bg-gradient-to-r from-[#0C2340] via-[#0C2340]/80 to-[#0C2340]/50"></div>
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4">
+      <nav aria-label="Breadcrumb" class="mb-6">
+        <ol class="flex items-center gap-2 text-white/50" style="font-size: 0.8125rem;">
+          <li><a href="/" class="hover:text-white">Home</a></li>
+          <li><svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 5l7 7-7 7"></path></svg></li>
+          <li class="text-white">About</li>
+        </ol>
+      </nav>
+      <h1 class="text-white mb-4 max-w-3xl" style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.2;">
+        Powering Africa&apos;s Sustainable Future Since 2017
+      </h1>
+      <p class="text-white/70 max-w-2xl" style="font-size: 1.125rem; line-height: 1.7;">
+        {companyInfo.description}
+      </p>
+    </div>
+  </section>
+
+  {/* Mission & Vision */}
+  <section class="py-16 md:py-24">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+        <div>
+          <h2 class="text-[#0C2340] mb-6" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; line-height: 1.3;">Our Mission</h2>
+          <p class="text-[#5A6A7E] mb-8" style="font-size: 1.0625rem; line-height: 1.8;">
+            To empower African businesses with reliable, cost-effective, and sustainable solar energy solutions that drive economic growth while protecting our planet. We believe every commercial and industrial facility in Africa deserves access to clean, affordable power.
+          </p>
+          <h2 class="text-[#0C2340] mb-6" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700; line-height: 1.3;">Our Vision</h2>
+          <p class="text-[#5A6A7E] mb-8" style="font-size: 1.0625rem; line-height: 1.8;">
+            To be Africa&apos;s most trusted partner for commercial and industrial solar energy, leading the continent&apos;s transition to a sustainable energy future. By 2030, we aim to have aided in creating sustainability in all critical Agricultural, Utility and Industrial sectors with clean solar energy, contributing significantly to Africa&apos;s carbon reduction goals.
+          </p>
+          <div class="grid grid-cols-2 gap-4">
+            {stats.map(s => (
+              <div class="bg-[#F5F7FA] rounded-xl p-4">
+                <div class="text-[#009BFF] text-center" style="font-size: 1.75rem; font-weight: 800;">{s.value}</div>
+                <div class="text-[#5A6A7E] text-center" style="font-size: 0.875rem;">{s.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <img src={IMAGES.renewable} alt="Renewable solar energy installation powering African businesses" class="rounded-xl w-full shadow-lg" loading="lazy" decoding="async" />
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Values */}
+  <section class="py-16 md:py-24 bg-[#F5F7FA]" aria-labelledby="values-heading">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 id="values-heading" class="text-[#0C2340] mb-4" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Our Values</h2>
+        <p class="text-[#5A6A7E] max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+          The principles that guide everything we do, from product selection to project delivery.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {values.map(val => (
+          <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+            <div class="w-12 h-12 rounded-xl bg-[#E6F3FF] flex items-center justify-center mb-4">
+              <svg class="w-6 h-6 text-[#009BFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+            </div>
+            <h3 class="text-[#0C2340] mb-2" style="font-size: 1.125rem; font-weight: 600;">{val.title}</h3>
+            <p class="text-[#5A6A7E]" style="font-size: 0.875rem; line-height: 1.7;">{val.desc}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* Timeline */}
+  <section class="py-16 md:py-24" aria-labelledby="timeline-heading">
+    <div class="max-w-3xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 id="timeline-heading" class="text-[#0C2340] mb-4" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Our Journey</h2>
+      </div>
+      <div class="relative">
+        <div class="absolute left-6 md:left-1/2 top-0 bottom-0 w-0.5 bg-[#009BFF]/20 -translate-x-1/2"></div>
+        <div class="space-y-8">
+          {timeline.map((item, i) => (
+            <div class={`relative flex items-start gap-6 ${i % 2 === 0 ? 'md:flex-row' : 'md:flex-row-reverse'}`}>
+              <div class={`flex-1 ${i % 2 === 0 ? 'md:text-right' : ''} hidden md:block`}></div>
+              <div class="w-12 h-12 rounded-full bg-[#009BFF] text-white flex items-center justify-center shrink-0 z-10 relative" style="font-size: 0.75rem; font-weight: 700;">
+                {item.year}
+              </div>
+              <div class="flex-1 pb-2">
+                <h3 class="text-[#0C2340] mb-1" style="font-size: 1.0625rem; font-weight: 600;">{item.title}</h3>
+                <p class="text-[#5A6A7E]" style="font-size: 0.875rem; line-height: 1.6;">{item.desc}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* Certifications */}
+  <section class="py-16 md:py-24 bg-[#0C2340]" aria-labelledby="certs-heading">
+    <div class="max-w-7xl mx-auto px-4">
+      <div class="text-center mb-12">
+        <h2 id="certs-heading" class="text-white mb-4" style="font-size: clamp(1.5rem, 3vw, 2rem); font-weight: 700;">Quality &amp; Compliance Standards</h2>
+        <p class="text-white/60 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+          Livoltek products are engineered and tested to internationally recognised safety, performance, and grid-compliance standards.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+          <h3 class="text-white mb-4" style="font-size: 1rem; font-weight: 600;">Product Safety &amp; Performance</h3>
+          <ul class="space-y-3">
+            {[
+              'IEC 62109-1/2 — Safety of power converters (solar inverters)',
+              'IEC 62619 — Safety of lithium batteries for industrial applications',
+              'UL 9540 — Energy storage system safety',
+              'IEC 61851 — Electric vehicle supply equipment safety',
+              'CE Marking — European conformity for applicable product lines',
+            ].map(cert => (
+              <li class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#009BFF] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-white/80" style="font-size: 0.875rem;">{cert}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+        <div class="bg-white/5 rounded-xl p-6 border border-white/10">
+          <h3 class="text-white mb-4" style="font-size: 1rem; font-weight: 600;">Grid Compliance &amp; Quality Systems</h3>
+          <ul class="space-y-3">
+            {[
+              'NRS 097-2-1 — Select inverter models tested & approved for SA grid connection',
+              'ISO 9001 — Quality management system alignment',
+              'ISO 14001 — Environmental management system alignment',
+              'IEC 61000 — Electromagnetic compatibility (EMC) compliance',
+            ].map(cert => (
+              <li class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#009BFF] shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="text-white/80" style="font-size: 0.875rem;">{cert}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

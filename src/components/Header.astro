@@ -1,0 +1,95 @@
+---
+/**
+ * HEADER — Static Astro component
+ * =================================
+ *
+ * The header renders as static HTML. The mobile menu toggle is a React
+ * island (HeaderMobileMenu.tsx) hydrated on interaction.
+ *
+ * MIGRATION NOTE:
+ *   Copy the full nav items, logo, CTA buttons, and styling from your
+ *   existing Header.tsx. The desktop nav is 100% static. Only the mobile
+ *   hamburger menu needs React (for useState toggle).
+ */
+import HeaderMobileMenu from './HeaderMobileMenu.tsx';
+import { companyInfo } from '../lib/mockData';
+
+const livoltekLogo = '/images/livoltek-logo.png';
+
+const navItems = [
+  { label: 'Home', href: '/' },
+  { label: 'Products', href: '/products' },
+  { label: 'Solutions', href: '/solutions' },
+  { label: 'Insights', href: '/insights' },
+  { label: 'Resources', href: '/resources' },
+  { label: 'About', href: '/about' },
+  { label: 'Contact', href: '/contact' },
+];
+
+// Get the current path for active-link highlighting
+const currentPath = Astro.url.pathname;
+---
+
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-[72px]">
+      {/* Logo */}
+      <a href="/" class="flex items-center gap-3 shrink-0" aria-label="Livoltek Africa Home">
+        <img src={livoltekLogo} alt="Livoltek Africa" class="h-7 w-auto" loading="eager" />
+      </a>
+
+      {/* Desktop Nav */}
+      <nav class="hidden lg:flex items-center gap-1" aria-label="Main navigation">
+        {navItems.map((item) => {
+          const isActive = currentPath === item.href ||
+            (item.href !== '/' && currentPath.startsWith(item.href));
+          return (
+            <a
+              href={item.href}
+              class:list={[
+                'px-4 py-2 rounded-lg transition-colors',
+                isActive
+                  ? 'text-[#009BFF] bg-[#E6F3FF]'
+                  : 'text-[#0C2340] hover:text-[#009BFF] hover:bg-[#F5F7FA]',
+              ]}
+              style="font-size: 0.9375rem; font-weight: 500;"
+              aria-current={isActive ? 'page' : undefined}
+            >
+              {item.label}
+            </a>
+          );
+        })}
+      </nav>
+
+      {/* Desktop CTAs */}
+      <div class="hidden lg:flex items-center gap-3">
+        <a
+          href={`tel:${companyInfo.phone}`}
+          class="flex items-center gap-2 px-4 py-2 text-[#0C2340] hover:text-[#009BFF] transition-colors"
+          style="font-size: 0.875rem; font-weight: 500;"
+        >
+          {/* Phone icon inline SVG */}
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+            <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+          </svg>
+          {companyInfo.phone}
+        </a>
+        <a
+          href="/contact/quote-request"
+          class="bg-[#009BFF] hover:bg-[#0080D9] text-white px-5 py-2.5 rounded-lg transition-colors"
+          style="font-size: 0.875rem; font-weight: 600;"
+        >
+          Get a Quote
+        </a>
+      </div>
+
+      {/* Mobile Menu — React Island (hydrated on interaction) */}
+      <HeaderMobileMenu
+        client:idle
+        navItems={navItems}
+        currentPath={currentPath}
+        phone={companyInfo.phone}
+      />
+    </div>
+  </div>
+</header>

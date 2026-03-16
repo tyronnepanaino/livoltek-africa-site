@@ -1,0 +1,58 @@
+---
+/**
+ * RESOURCES LISTING PAGE
+ * ========================
+ * MIGRATION NOTE: Copy full JSX from ResourcesPage.tsx
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchResourcesStatic } from '../../lib/firestore-static';
+import { initialResources, companyInfo } from '../../lib/mockData';
+import { buildCollectionPageSchema, buildBreadcrumbSchema } from '../../lib/schema';
+
+let resources;
+try { resources = await fetchResourcesStatic(); } catch { resources = initialResources; }
+const published = resources.filter(r => r.status === 'published');
+
+const jsonLd = [
+  buildCollectionPageSchema('Resources', 'Technical datasheets, case studies, whitepapers, and guides for commercial solar.', `${companyInfo.url}/resources`),
+  buildBreadcrumbSchema([{ name: 'Home', url: companyInfo.url }, { name: 'Resources', url: `${companyInfo.url}/resources` }]),
+];
+---
+
+<BaseLayout
+  title="Solar Resources — Datasheets, Case Studies & Guides"
+  description="Download technical datasheets, case studies, whitepapers, and implementation guides for Livoltek Africa's commercial and industrial solar products."
+  keywords="solar datasheets, solar case studies Africa, C&I solar whitepapers, solar guides"
+  canonicalPath="/resources"
+  jsonLd={jsonLd}
+>
+  <section class="bg-[#0C2340] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-white mb-4" style="font-size: 2.25rem; font-weight: 800;">Resources</h1>
+      <p class="text-gray-300 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        Technical datasheets, case studies, whitepapers, and guides to support your solar project.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-[#F5F7FA]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {published.map((resource) => (
+          <a href={`/resources/${resource.slug}`} class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
+            <div class="aspect-[16/9]">
+              <img src={resource.image} alt={resource.title} class="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div class="p-5">
+              <span class="text-[#009BFF]" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">
+                {resource.resourceType.replace('-', ' ')}
+              </span>
+              <h3 class="text-[#0C2340] mt-1 group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">{resource.title}</h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">{resource.excerpt}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

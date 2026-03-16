@@ -1,0 +1,186 @@
+---
+/**
+ * PRODUCT DETAIL PAGE — Dynamic Route
+ * ======================================
+ *
+ * This file replaces THREE things from the old SPA:
+ *   1. ProductDetailPage.tsx (the React component)
+ *   2. The Firestore slug fetch in prerender.mjs
+ *   3. The OG tag injection in inject-og-tags.mjs
+ *
+ * Astro calls getStaticPaths() at build time, which:
+ *   - Fetches all published products from Firestore
+ *   - Falls back to mock data if Firestore is unavailable
+ *   - Generates a static HTML page for each product slug
+ *   - Each page has correct OG tags, JSON-LD, and full content
+ *
+ * RESULT: Every product page is a complete static HTML file with
+ * perfect SEO — no JavaScript required for crawlers to see full content.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchProductsStatic } from '../../lib/firestore-static';
+import { initialProducts, companyInfo } from '../../lib/mockData';
+import { buildProductSchema, buildBreadcrumbSchema } from '../../lib/schema';
+import type { Product } from '../../lib/types';
+
+// ─── Generate static paths from Firestore ─────────────────
+export async function getStaticPaths() {
+  let products: Product[];
+  try {
+    products = await fetchProductsStatic();
+  } catch {
+    products = initialProducts;
+  }
+
+  return products
+    .filter(p => p.status === 'published')
+    .map(product => ({
+      params: { slug: product.slug },
+      props: { product },
+    }));
+}
+
+// ─── Page props ───────────────────────────────────────────
+const { product } = Astro.props as { product: Product };
+
+// Strip HTML from description for meta tags
+const plainDescription = product.description.replace(/<[^>]*>/g, '').substring(0, 160);
+
+// Structured data
+const jsonLd = [
+  buildProductSchema(product),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Products', url: `${companyInfo.url}/products` },
+    { name: product.title, url: `${companyInfo.url}/products/${product.slug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  title={product.metaTitle || product.title}
+  description={product.metaDescription || plainDescription}
+  canonicalPath={`/products/${product.slug}`}
+  ogType="product"
+  ogImage={product.image}
+  ogImageAlt={product.title}
+  jsonLd={jsonLd}
+>
+  {/* ─── Breadcrumb ───────────────────────────────────────── */}
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF] transition-colors">Home</a></li>
+        <li>/</li>
+        <li><a href="/products" class="hover:text-[#009BFF] transition-colors">Products</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">{product.title}</li>
+      </ol>
+    </div>
+  </nav>
+
+  {/* ─── Product Hero ─────────────────────────────────────── */}
+  <section class="py-12 lg:py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        {/* Image */}
+        <div class="bg-[#F5F7FA] rounded-2xl p-8 flex items-center justify-center">
+          <img
+            src={product.image}
+            alt={product.title}
+            class="w-full max-h-[500px] object-contain"
+            loading="eager"
+            width="800"
+            height="800"
+          />
+        </div>
+
+        {/* Info */}
+        <div>
+          <span
+            class="inline-block text-[#009BFF] mb-3"
+            style="font-size: 0.8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;"
+          >
+            {product.category}
+          </span>
+          <h1 class="text-[#0C2340] mb-4" style="font-size: 2rem; font-weight: 700;">
+            {product.title}
+          </h1>
+          <p class="text-[#5A6A7E] mb-8" style="font-size: 1.0625rem; line-height: 1.7;">
+            {product.shortDescription}
+          </p>
+
+          {/* Key Features */}
+          {product.features.length > 0 && (
+            <div class="mb-8">
+              <h2 class="text-[#0C2340] mb-4" style="font-size: 1.125rem; font-weight: 600;">
+                Key Features
+              </h2>
+              <ul class="space-y-2">
+                {product.features.map((feature) => (
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 text-[#27AE60] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                      <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span class="text-[#5A6A7E]" style="font-size: 0.9375rem;">{feature}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* CTA */}
+          <div class="flex flex-col sm:flex-row gap-3">
+            <a
+              href="/contact/quote-request"
+              class="inline-flex items-center justify-center bg-[#009BFF] hover:bg-[#0080D9] text-white px-8 py-3 rounded-lg transition-colors"
+              style="font-size: 0.9375rem; font-weight: 600;"
+            >
+              Request a Quote
+            </a>
+            <a
+              href="/contact"
+              class="inline-flex items-center justify-center border border-gray-200 text-[#0C2340] hover:bg-[#F5F7FA] px-8 py-3 rounded-lg transition-colors"
+              style="font-size: 0.9375rem; font-weight: 600;"
+            >
+              Contact Us
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ─── Specifications Table ─────────────────────────────── */}
+  {Object.keys(product.specifications).length > 0 && (
+    <section class="py-12 bg-[#F5F7FA]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-[#0C2340] mb-8" style="font-size: 1.5rem; font-weight: 700;">
+          Technical Specifications
+        </h2>
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+          <table class="w-full">
+            <tbody>
+              {Object.entries(product.specifications).map(([key, value], i) => (
+                <tr class={i % 2 === 0 ? 'bg-white' : 'bg-[#F9FAFB]'}>
+                  <td class="px-6 py-3 text-[#0C2340]" style="font-size: 0.9375rem; font-weight: 500;">{key}</td>
+                  <td class="px-6 py-3 text-[#5A6A7E]" style="font-size: 0.9375rem;">{value}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Full Description (rich HTML content) ─────────────── */}
+  <section class="py-12">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div
+        class="prose prose-lg max-w-none text-[#5A6A7E]"
+        set:html={product.description}
+      />
+    </div>
+  </section>
+</BaseLayout>

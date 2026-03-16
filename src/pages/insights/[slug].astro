@@ -1,0 +1,134 @@
+---
+/**
+ * INSIGHT DETAIL PAGE — Dynamic Route
+ * ======================================
+ *
+ * Same pattern as products/[slug].astro.
+ * Fetches all published insights from Firestore at build time.
+ *
+ * MIGRATION NOTE:
+ *   Copy the full JSX body from your existing InsightDetailPage.tsx.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchInsightsStatic } from '../../lib/firestore-static';
+import { initialInsights, companyInfo } from '../../lib/mockData';
+import { buildArticleSchema, buildBreadcrumbSchema } from '../../lib/schema';
+import type { Insight } from '../../lib/types';
+
+export async function getStaticPaths() {
+  let insights: Insight[];
+  try {
+    insights = await fetchInsightsStatic();
+  } catch {
+    insights = initialInsights;
+  }
+
+  return insights
+    .filter(i => i.status === 'published')
+    .map(insight => ({
+      params: { slug: insight.slug },
+      props: { insight },
+    }));
+}
+
+const { insight } = Astro.props as { insight: Insight };
+
+const jsonLd = [
+  buildArticleSchema({
+    ...insight,
+    tags: insight.tags,
+    category: insight.category,
+    content: insight.content,
+  }, 'insights'),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Insights', url: `${companyInfo.url}/insights` },
+    { name: insight.title, url: `${companyInfo.url}/insights/${insight.slug}` },
+  ]),
+];
+---
+
+<BaseLayout
+  title={insight.metaTitle || insight.title}
+  description={insight.metaDescription || insight.excerpt}
+  canonicalPath={`/insights/${insight.slug}`}
+  ogType="article"
+  ogImage={insight.image}
+  ogImageAlt={insight.title}
+  article={{
+    publishedTime: insight.publishedAt,
+    modifiedTime: insight.updatedAt,
+    author: insight.author,
+    section: insight.category,
+    tags: insight.tags,
+  }}
+  jsonLd={jsonLd}
+>
+  {/* Breadcrumb */}
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF]">Home</a></li>
+        <li>/</li>
+        <li><a href="/insights" class="hover:text-[#009BFF]">Insights</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">{insight.title}</li>
+      </ol>
+    </div>
+  </nav>
+
+  {/* Article header */}
+  <article class="py-12 lg:py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <header class="mb-10">
+        <span class="text-[#009BFF]" style="font-size: 0.8125rem; font-weight: 600; text-transform: uppercase;">
+          {insight.category}
+        </span>
+        <h1 class="text-[#0C2340] mt-2 mb-4" style="font-size: 2.25rem; font-weight: 700; line-height: 1.2;">
+          {insight.title}
+        </h1>
+        <div class="flex items-center gap-4 text-[#5A6A7E]" style="font-size: 0.875rem;">
+          <span>By {insight.author}</span>
+          {insight.readTime && <span>&middot; {insight.readTime}</span>}
+          {insight.publishedAt && (
+            <time datetime={insight.publishedAt}>
+              {new Date(insight.publishedAt).toLocaleDateString('en-ZA', { year: 'numeric', month: 'long', day: 'numeric' })}
+            </time>
+          )}
+        </div>
+      </header>
+
+      {/* Featured image */}
+      <img
+        src={insight.image}
+        alt={insight.title}
+        class="w-full rounded-2xl mb-10"
+        loading="eager"
+        width="1200"
+        height="630"
+      />
+
+      {/* Content */}
+      <div
+        class="prose prose-lg max-w-none text-[#5A6A7E]"
+        set:html={insight.content}
+      />
+
+      {/* Tags */}
+      {insight.tags.length > 0 && (
+        <div class="mt-10 pt-8 border-t border-gray-100">
+          <div class="flex flex-wrap gap-2">
+            {insight.tags.map((tag) => (
+              <span
+                class="px-3 py-1 rounded-full bg-[#F5F7FA] text-[#5A6A7E]"
+                style="font-size: 0.8125rem;"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </article>
+</BaseLayout>

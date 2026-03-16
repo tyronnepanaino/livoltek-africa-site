@@ -1,0 +1,236 @@
+---
+/**
+ * HOME PAGE — Livoltek Africa
+ * ==============================
+ *
+ * Statically generated at build time. Fetches products, insights, and
+ * resources from Firestore (falling back to mockData if unavailable).
+ *
+ * MIGRATION NOTE:
+ *   Copy the full JSX body from your existing HomePage.tsx into the
+ *   template section below. Replace:
+ *     - <Link to="/...">  →  <a href="/...">
+ *     - useStore() data   →  the `products`, `insights`, `resources` variables
+ *     - ImageWithFallback →  <img> (Astro optimizes images natively)
+ *     - All lucide-react icons work as-is (imported in the frontmatter)
+ *
+ * Schema.org structured data is passed to the layout via jsonLd prop
+ * instead of rendering <JsonLd> React components.
+ */
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { fetchProductsStatic, fetchInsightsStatic, fetchResourcesStatic } from '../lib/firestore-static';
+import { companyInfo, solutions, IMAGES, initialProducts, initialInsights, initialResources } from '../lib/mockData';
+import {
+  buildOrganizationSchema,
+  buildWebSiteSchema,
+  buildLocalBusinessSchema,
+  buildFAQSchema,
+  buildSiteNavigationSchema,
+} from '../lib/schema';
+
+// ─── Fetch data at build time ─────────────────────────────
+let products = await fetchProductsStatic().catch(() => initialProducts);
+let insights = await fetchInsightsStatic().catch(() => initialInsights);
+let resources = await fetchResourcesStatic().catch(() => initialResources);
+
+// Filter to published only
+const publishedProducts = products.filter(p => p.status === 'published').slice(0, 4);
+const publishedInsights = insights.filter(i => i.status === 'published').slice(0, 3);
+const publishedResources = resources.filter(r => r.status === 'published').slice(0, 3);
+
+// ─── FAQ data (same as existing HomePage.tsx) ─────────────
+const faqs = [
+  {
+    question: 'What size commercial solar system do I need for my business?',
+    answer: 'The optimal system size depends on your electricity consumption, available roof/ground space, budget, and energy goals. Our engineering team conducts a comprehensive site assessment and load analysis to design a system that maximizes your return on investment. Typical C&I systems range from 50kW to several MW.',
+  },
+  {
+    question: 'What is the payback period for commercial solar in Africa?',
+    answer: 'Most commercial solar installations in Africa achieve payback within 3-5 years, depending on location, electricity tariff, system size, and financing structure. With system lifespans of 25+ years, this represents excellent long-term value.',
+  },
+  {
+    question: 'Do you offer financing options for solar installations?',
+    answer: 'Yes, we offer multiple financing options including outright purchase, Power Purchase Agreements (PPAs), solar leases, and partnerships with development finance institutions.',
+  },
+  {
+    question: 'Can solar work with my existing backup generator?',
+    answer: 'Absolutely. Our hybrid inverter solutions seamlessly integrate with existing diesel generators, grid power, and battery storage.',
+  },
+  {
+    question: 'What maintenance is required for commercial solar systems?',
+    answer: 'Commercial solar systems require minimal maintenance. Regular panel cleaning, annual electrical inspections, and monitoring system health checks are typically sufficient.',
+  },
+];
+
+// ─── Structured data ──────────────────────────────────────
+const jsonLd = [
+  buildOrganizationSchema(),
+  buildWebSiteSchema(),
+  buildLocalBusinessSchema(),
+  buildFAQSchema(faqs),
+  buildSiteNavigationSchema(),
+];
+
+// ─── Stats ────────────────────────────────────────────────
+const stats = [
+  { value: companyInfo.mwInstalled, label: 'MW Installed Globally' },
+  { value: companyInfo.projectsCompleted, label: 'Product Installations' },
+  { value: companyInfo.countriesServed, label: 'African Countries' },
+  { value: companyInfo.employees, label: 'Solar Team Members' },
+];
+---
+
+<BaseLayout
+  title="Commercial & Industrial Solar Products & Solutions in Africa"
+  description="Africa's leading C&I solar provider. Commercial solar inverters, battery energy storage (BESS), EV charging stations, solar panels and monitoring systems. Load shedding solutions for South African businesses."
+  keywords="commercial solar South Africa, industrial solar inverter, BESS battery storage Africa, C&I solar solutions, load shedding solutions, solar energy Africa"
+  canonicalPath=""
+  jsonLd={jsonLd}
+>
+  {/* ─── HERO SECTION ─────────────────────────────────────── */}
+  <section class="relative bg-[#0C2340] text-white overflow-hidden">
+    <div class="absolute inset-0">
+      <img
+        src={IMAGES.heroSolar}
+        alt="Commercial solar installation on industrial rooftop in Africa"
+        class="w-full h-full object-cover opacity-30"
+        loading="eager"
+        width="1920"
+        height="1080"
+      />
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <div class="max-w-3xl">
+        <h1 class="text-white mb-6" style="font-size: 2.5rem; font-weight: 800; line-height: 1.15;">
+          Powering Africa's Commercial &amp; Industrial Future with Solar Energy
+        </h1>
+        <p class="text-gray-200 mb-8 max-w-2xl" style="font-size: 1.125rem; line-height: 1.7;">
+          {companyInfo.description}
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href="/products"
+            class="inline-flex items-center justify-center bg-[#009BFF] hover:bg-[#0080D9] text-white px-8 py-3.5 rounded-lg transition-colors"
+            style="font-size: 1rem; font-weight: 600;"
+          >
+            Explore Products
+          </a>
+          <a
+            href="/contact/quote-request"
+            class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur text-white border border-white/20 px-8 py-3.5 rounded-lg transition-colors"
+            style="font-size: 1rem; font-weight: 600;"
+          >
+            Get a Quote
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ─── STATS BAR ────────────────────────────────────────── */}
+  <section class="bg-white border-b border-gray-100">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+        {stats.map((stat) => (
+          <div class="text-center">
+            <div class="text-[#009BFF]" style="font-size: 2rem; font-weight: 800;">{stat.value}</div>
+            <div class="text-[#5A6A7E] mt-1" style="font-size: 0.875rem; font-weight: 500;">{stat.label}</div>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/* ─── FEATURED PRODUCTS ────────────────────────────────── */}
+  <section class="py-20 bg-[#F5F7FA]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center mb-12">
+        <h2 class="text-[#0C2340] mb-4" style="font-size: 2rem; font-weight: 700;">
+          Featured Products
+        </h2>
+        <p class="text-[#5A6A7E] max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+          Explore our range of commercial and industrial solar products designed for the African market.
+        </p>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+        {publishedProducts.map((product) => (
+          <a
+            href={`/products/${product.slug}`}
+            class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+          >
+            <div class="aspect-[4/3] bg-[#F5F7FA] p-4">
+              <img
+                src={product.image}
+                alt={product.title}
+                class="w-full h-full object-contain"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+            <div class="p-5">
+              <span class="text-[#009BFF]" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                {product.category}
+              </span>
+              <h3 class="text-[#0C2340] mt-1 group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">
+                {product.title}
+              </h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">
+                {product.shortDescription}
+              </p>
+            </div>
+          </a>
+        ))}
+      </div>
+      <div class="text-center mt-10">
+        <a
+          href="/products"
+          class="inline-flex items-center gap-2 bg-[#009BFF] hover:bg-[#0080D9] text-white px-8 py-3 rounded-lg transition-colors"
+          style="font-size: 0.9375rem; font-weight: 600;"
+        >
+          View All Products
+        </a>
+      </div>
+    </div>
+  </section>
+
+  {/* ─── FAQ SECTION ──────────────────────────────────────── */}
+  <section class="py-20 bg-white">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h2 class="text-center text-[#0C2340] mb-12" style="font-size: 2rem; font-weight: 700;">
+        Frequently Asked Questions
+      </h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group bg-[#F5F7FA] rounded-xl">
+            <summary
+              class="flex items-center justify-between cursor-pointer px-6 py-5 text-[#0C2340] hover:text-[#009BFF] transition-colors list-none"
+              style="font-size: 1rem; font-weight: 600;"
+            >
+              {faq.question}
+              <svg class="w-5 h-5 shrink-0 ml-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="px-6 pb-5">
+              <p class="text-[#5A6A7E]" style="font-size: 0.9375rem; line-height: 1.7;">
+                {faq.answer}
+              </p>
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  {/*
+    MIGRATION TODO:
+    Copy the remaining sections from your HomePage.tsx:
+    - Solutions showcase
+    - Latest insights grid
+    - CTA banner
+    - Testimonials (if any)
+
+    Replace <Link to="..."> with <a href="..."> throughout.
+    Replace useStore() references with the static variables defined above.
+  */}
+</BaseLayout>

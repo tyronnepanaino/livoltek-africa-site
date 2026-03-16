@@ -1,0 +1,61 @@
+---
+/**
+ * INSIGHTS LISTING PAGE
+ * =======================
+ * MIGRATION NOTE: Copy full JSX from InsightsPage.tsx
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchInsightsStatic } from '../../lib/firestore-static';
+import { initialInsights, companyInfo } from '../../lib/mockData';
+import { buildCollectionPageSchema, buildBreadcrumbSchema, buildItemListSchema } from '../../lib/schema';
+
+let insights;
+try { insights = await fetchInsightsStatic(); } catch { insights = initialInsights; }
+const published = insights.filter(i => i.status === 'published');
+
+const jsonLd = [
+  buildCollectionPageSchema('Insights', 'Industry insights, guides, and thought leadership on commercial solar energy in Africa.', `${companyInfo.url}/insights`),
+  buildBreadcrumbSchema([{ name: 'Home', url: companyInfo.url }, { name: 'Insights', url: `${companyInfo.url}/insights` }]),
+  buildItemListSchema(published.map((i, idx) => ({ name: i.title, url: `${companyInfo.url}/insights/${i.slug}`, image: i.image, position: idx + 1 })), 'Livoltek Africa Insights'),
+];
+---
+
+<BaseLayout
+  title="Solar Industry Insights & Guides"
+  description="Expert insights on commercial solar energy, battery storage, load shedding solutions, and the African energy transition."
+  keywords="solar energy insights Africa, commercial solar guides, C&I solar industry"
+  canonicalPath="/insights"
+  jsonLd={jsonLd}
+>
+  <section class="bg-[#0C2340] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-white mb-4" style="font-size: 2.25rem; font-weight: 800;">Insights & Guides</h1>
+      <p class="text-gray-300 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        Expert analysis, industry updates, and practical guides for commercial solar energy in Africa.
+      </p>
+    </div>
+  </section>
+
+  <section class="py-12 bg-[#F5F7FA]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {published.map((insight) => (
+          <a href={`/insights/${insight.slug}`} class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all">
+            <div class="aspect-[16/9]">
+              <img src={insight.image} alt={insight.title} class="w-full h-full object-cover" loading="lazy" />
+            </div>
+            <div class="p-5">
+              <span class="text-[#009BFF]" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase;">{insight.category}</span>
+              <h3 class="text-[#0C2340] mt-1 group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">{insight.title}</h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">{insight.excerpt}</p>
+              <div class="flex items-center gap-2 mt-3 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+                <span>{insight.author}</span>
+                {insight.readTime && <span>&middot; {insight.readTime}</span>}
+              </div>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

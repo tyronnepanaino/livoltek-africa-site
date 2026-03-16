@@ -1,0 +1,144 @@
+---
+/**
+ * PRODUCTS LISTING PAGE
+ * =======================
+ *
+ * Lists all published products, grouped by category.
+ * Fetched from Firestore at build time.
+ *
+ * MIGRATION NOTE:
+ *   Copy the full JSX from ProductsPage.tsx. Replace <Link> with <a>.
+ *   The category filter (by URL param) is handled by the static
+ *   category/[slug].astro page instead of client-side filtering.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { fetchProductsStatic } from '../../lib/firestore-static';
+import { initialProducts, companyInfo } from '../../lib/mockData';
+import { buildCollectionPageSchema, buildBreadcrumbSchema, buildItemListSchema } from '../../lib/schema';
+
+let products;
+try {
+  products = await fetchProductsStatic();
+} catch {
+  products = initialProducts;
+}
+
+const published = products.filter(p => p.status === 'published');
+
+// Group by category
+const categories = [...new Set(published.map(p => p.category))];
+
+const jsonLd = [
+  buildCollectionPageSchema(
+    'Solar Products',
+    "Browse Livoltek Africa's complete range of commercial and industrial solar products.",
+    `${companyInfo.url}/products`
+  ),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Products', url: `${companyInfo.url}/products` },
+  ]),
+  buildItemListSchema(
+    published.map((p, i) => ({
+      name: p.title,
+      url: `${companyInfo.url}/products/${p.slug}`,
+      image: p.image,
+      position: i + 1,
+    })),
+    'Livoltek Africa Solar Products'
+  ),
+];
+---
+
+<BaseLayout
+  title="Commercial & Industrial Solar Products"
+  description="Browse Livoltek Africa's complete range of C&I solar products: inverters, battery storage (BESS), solar panels, EV charging stations, and monitoring systems."
+  keywords="commercial solar products Africa, industrial solar inverter, BESS battery storage, solar panels, EV charging"
+  canonicalPath="/products"
+  jsonLd={jsonLd}
+>
+  {/* Breadcrumb */}
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF]">Home</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">Products</li>
+      </ol>
+    </div>
+  </nav>
+
+  {/* Hero */}
+  <section class="bg-[#0C2340] text-white py-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h1 class="text-white mb-4" style="font-size: 2.25rem; font-weight: 800;">
+        Commercial &amp; Industrial Solar Products
+      </h1>
+      <p class="text-gray-300 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        Explore our full range of solar inverters, battery energy storage systems, solar panels,
+        EV charging stations, and monitoring solutions designed for African businesses.
+      </p>
+    </div>
+  </section>
+
+  {/* Category filter links */}
+  <section class="bg-white border-b border-gray-100 sticky top-[72px] z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+      <div class="flex flex-wrap gap-2">
+        <a
+          href="/products"
+          class="px-4 py-2 rounded-full bg-[#009BFF] text-white"
+          style="font-size: 0.8125rem; font-weight: 500;"
+        >
+          All Products
+        </a>
+        {categories.map((cat) => {
+          const slug = cat.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+          return (
+            <a
+              href={`/products/category/${slug}`}
+              class="px-4 py-2 rounded-full border border-gray-200 text-[#5A6A7E] hover:border-[#009BFF] hover:text-[#009BFF] transition-colors"
+              style="font-size: 0.8125rem; font-weight: 500;"
+            >
+              {cat}
+            </a>
+          );
+        })}
+      </div>
+    </div>
+  </section>
+
+  {/* Product grid */}
+  <section class="py-12 bg-[#F5F7FA]">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {published.map((product) => (
+          <a
+            href={`/products/${product.slug}`}
+            class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300"
+          >
+            <div class="aspect-[4/3] bg-[#F5F7FA] p-4">
+              <img
+                src={product.image}
+                alt={product.title}
+                class="w-full h-full object-contain"
+                loading="lazy"
+              />
+            </div>
+            <div class="p-5">
+              <span class="text-[#009BFF]" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                {product.category}
+              </span>
+              <h3 class="text-[#0C2340] mt-1 group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">
+                {product.title}
+              </h3>
+              <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">
+                {product.shortDescription}
+              </p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,111 @@
+---
+/**
+ * SOLUTION DETAIL PAGE — Static Route from mockData
+ * ====================================================
+ *
+ * Solutions are not in Firestore — they come from mockData.solutions[].
+ * getStaticPaths() iterates solutions and generates a page for each.
+ *
+ * MIGRATION NOTE:
+ *   Copy the full JSX body from your existing SolutionDetailPage.tsx.
+ */
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { solutions, companyInfo } from '../../lib/mockData';
+import { buildServiceSchema, buildBreadcrumbSchema, buildFAQSchema } from '../../lib/schema';
+import type { Solution } from '../../lib/types';
+
+export function getStaticPaths() {
+  return solutions.map(solution => ({
+    params: { slug: solution.slug },
+    props: { solution },
+  }));
+}
+
+const { solution } = Astro.props as { solution: Solution };
+
+const jsonLd = [
+  buildServiceSchema(solution),
+  buildBreadcrumbSchema([
+    { name: 'Home', url: companyInfo.url },
+    { name: 'Solutions', url: `${companyInfo.url}/solutions` },
+    { name: solution.title, url: `${companyInfo.url}/solutions/${solution.slug}` },
+  ]),
+  ...(solution.faqs?.length ? [buildFAQSchema(solution.faqs)] : []),
+];
+
+const plainDesc = solution.longDescription
+  ? solution.longDescription.replace(/<[^>]*>/g, '').substring(0, 160)
+  : solution.shortDescription;
+---
+
+<BaseLayout
+  title={solution.metaTitle || solution.title}
+  description={solution.metaDescription || plainDesc}
+  keywords={solution.keywords}
+  canonicalPath={`/solutions/${solution.slug}`}
+  ogImage={solution.image}
+  ogImageAlt={solution.title}
+  jsonLd={jsonLd}
+>
+  {/* MIGRATION TODO: Copy full SolutionDetailPage.tsx JSX here */}
+  <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+      <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
+        <li><a href="/" class="hover:text-[#009BFF]">Home</a></li>
+        <li>/</li>
+        <li><a href="/solutions" class="hover:text-[#009BFF]">Solutions</a></li>
+        <li>/</li>
+        <li class="text-[#0C2340]" style="font-weight: 500;" aria-current="page">{solution.title}</li>
+      </ol>
+    </div>
+  </nav>
+
+  <section class="py-16">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-[#0C2340] mb-6" style="font-size: 2.25rem; font-weight: 700;">
+        {solution.title}
+      </h1>
+      <p class="text-[#5A6A7E] mb-8" style="font-size: 1.0625rem; line-height: 1.7;">
+        {solution.description}
+      </p>
+      <img src={solution.image} alt={solution.title} class="w-full rounded-2xl mb-10" loading="eager" width="1200" height="630" />
+
+      {/* Features */}
+      {solution.features.length > 0 && (
+        <div class="mb-12">
+          <h2 class="text-[#0C2340] mb-6" style="font-size: 1.5rem; font-weight: 700;">Key Features</h2>
+          <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {solution.features.map((feature) => (
+              <li class="flex items-start gap-3 bg-[#F5F7FA] rounded-xl p-4">
+                <svg class="w-5 h-5 text-[#27AE60] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-[#5A6A7E]" style="font-size: 0.9375rem;">{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
+      {/* FAQs */}
+      {solution.faqs && solution.faqs.length > 0 && (
+        <div>
+          <h2 class="text-[#0C2340] mb-6" style="font-size: 1.5rem; font-weight: 700;">Frequently Asked Questions</h2>
+          <div class="space-y-4">
+            {solution.faqs.map((faq) => (
+              <details class="group bg-[#F5F7FA] rounded-xl">
+                <summary class="flex items-center justify-between cursor-pointer px-6 py-5 text-[#0C2340] list-none" style="font-size: 1rem; font-weight: 600;">
+                  {faq.question}
+                  <svg class="w-5 h-5 shrink-0 ml-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 9l-7 7-7-7"></path></svg>
+                </summary>
+                <div class="px-6 pb-5">
+                  <p class="text-[#5A6A7E]" style="font-size: 0.9375rem; line-height: 1.7;">{faq.answer}</p>
+                </div>
+              </details>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>
