@@ -24,7 +24,7 @@ export function buildOrganizationSchema(): Record<string, unknown> {
     name: companyInfo.name,
     legalName: companyInfo.legalName,
     url: companyInfo.url,
-    logo: `${companyInfo.url}/logo.png`,
+    logo: `${companyInfo.url}/images/livoltek-logo.webp`,
     description: companyInfo.description,
     foundingDate: companyInfo.founded,
     email: companyInfo.email,
@@ -101,7 +101,7 @@ export function buildLocalBusinessSchema(): Record<string, unknown> {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
     name: companyInfo.name,
-    image: `${companyInfo.url}/logo.png`,
+    image: `${companyInfo.url}/images/livoltek-logo.webp`,
     url: companyInfo.url,
     telephone: companyInfo.phone,
     email: companyInfo.email,
@@ -241,7 +241,7 @@ export function buildArticleSchema(article: {
       name: companyInfo.name,
       logo: {
         '@type': 'ImageObject',
-        url: `${companyInfo.url}/logo.png`,
+        url: `${companyInfo.url}/images/livoltek-logo.webp`,
       },
     },
     mainEntityOfPage: {
