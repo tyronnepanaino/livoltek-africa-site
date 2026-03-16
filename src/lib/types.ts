@@ -75,6 +75,22 @@ export interface Solution {
   ctaTitle?: string;
   ctaDescription?: string;
   keywords?: string;
+  relatedProducts?: SolutionRelatedProduct[];
+  topologyDiagrams?: SolutionTopologyDiagram[];
+}
+
+export interface SolutionRelatedProduct {
+  name: string;
+  slug: string;
+  image: string;
+  category: string;
+  description?: string;
+}
+
+export interface SolutionTopologyDiagram {
+  title: string;
+  image: string;
+  description?: string;
 }
 
 export interface SolutionUseCase {

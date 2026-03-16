@@ -5,9 +5,6 @@
  *
  * Solutions are not in Firestore — they come from mockData.solutions[].
  * getStaticPaths() iterates solutions and generates a page for each.
- *
- * MIGRATION NOTE:
- *   Copy the full JSX body from your existing SolutionDetailPage.tsx.
  */
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { solutions, companyInfo } from '../../lib/mockData';
@@ -47,7 +44,7 @@ const plainDesc = solution.longDescription
   ogImageAlt={solution.title}
   jsonLd={jsonLd}
 >
-  {/* MIGRATION TODO: Copy full SolutionDetailPage.tsx JSX here */}
+  {/* ─── Breadcrumb ───────────────────────────────────────── */}
   <nav class="bg-[#F5F7FA] border-b border-gray-100" aria-label="Breadcrumb">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
       <ol class="flex items-center gap-2 text-[#5A6A7E]" style="font-size: 0.8125rem;">
@@ -60,52 +57,286 @@ const plainDesc = solution.longDescription
     </div>
   </nav>
 
+  {/* ─── Hero Section ─────────────────────────────────────── */}
+  <section class="relative bg-[#0C2340] text-white overflow-hidden">
+    <div class="absolute inset-0">
+      <img
+        src={solution.image}
+        alt={solution.title}
+        class="w-full h-full object-cover opacity-30"
+        loading="eager"
+        width="1920"
+        height="1080"
+      />
+    </div>
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+      <div class="max-w-3xl">
+        <h1 class="text-white mb-4" style="font-size: clamp(1.75rem, 4vw, 2.75rem); font-weight: 800; line-height: 1.15;">
+          {solution.title}
+        </h1>
+        {solution.heroSubtitle && (
+          <p class="text-gray-200 mb-8 max-w-2xl" style="font-size: 1.125rem; line-height: 1.7;">
+            {solution.heroSubtitle}
+          </p>
+        )}
+        <div class="flex flex-col sm:flex-row gap-4">
+          <a
+            href="/contact/quote-request"
+            class="inline-flex items-center justify-center bg-[#009BFF] hover:bg-[#0080D9] text-white px-8 py-3.5 rounded-lg transition-colors"
+            style="font-size: 1rem; font-weight: 600;"
+          >
+            Get a Quote
+          </a>
+          <a
+            href="/contact"
+            class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 backdrop-blur text-white border border-white/20 px-8 py-3.5 rounded-lg transition-colors"
+            style="font-size: 1rem; font-weight: 600;"
+          >
+            Talk to an Expert
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  {/* ─── Stats Bar ────────────────────────────────────────── */}
+  {solution.stats && solution.stats.length > 0 && (
+    <section class="bg-white border-b border-gray-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {solution.stats.map((stat) => (
+            <div class="text-center">
+              <div class="text-[#009BFF]" style="font-size: 1.75rem; font-weight: 800;">{stat.value}</div>
+              <div class="text-[#0C2340] mt-1" style="font-size: 0.875rem; font-weight: 600;">{stat.label}</div>
+              {stat.description && (
+                <div class="text-[#5A6A7E] mt-0.5" style="font-size: 0.75rem;">{stat.description}</div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Overview ─────────────────────────────────────────── */}
   <section class="py-16">
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-      <h1 class="text-[#0C2340] mb-6" style="font-size: 2.25rem; font-weight: 700;">
-        {solution.title}
-      </h1>
-      <p class="text-[#5A6A7E] mb-8" style="font-size: 1.0625rem; line-height: 1.7;">
+      <p class="text-[#5A6A7E]" style="font-size: 1.0625rem; line-height: 1.8;">
         {solution.description}
       </p>
-      <img src={solution.image} alt={solution.title} class="w-full rounded-2xl mb-10" loading="eager" width="1200" height="630" />
+    </div>
+  </section>
 
-      {/* Features */}
-      {solution.features.length > 0 && (
-        <div class="mb-12">
-          <h2 class="text-[#0C2340] mb-6" style="font-size: 1.5rem; font-weight: 700;">Key Features</h2>
-          <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {solution.features.map((feature) => (
-              <li class="flex items-start gap-3 bg-[#F5F7FA] rounded-xl p-4">
-                <svg class="w-5 h-5 text-[#27AE60] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
-                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-[#5A6A7E]" style="font-size: 0.9375rem;">{feature}</span>
-              </li>
-            ))}
-          </ul>
+  {/* ─── Use Cases / Solution Tiers ───────────────────────── */}
+  {solution.useCases && solution.useCases.length > 0 && (
+    <section class="py-16 bg-[#F5F7FA]">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-[#0C2340] mb-4" style="font-size: 2rem; font-weight: 700;">Solution Configurations</h2>
+          <p class="text-[#5A6A7E] max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+            Choose the right EV charging configuration for your use case.
+          </p>
         </div>
-      )}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {solution.useCases.map((useCase) => (
+            <div class="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
+              <div class="w-12 h-12 rounded-xl bg-[#E6F3FF] flex items-center justify-center mb-4">
+                {useCase.icon === 'home' && (
+                  <svg class="w-6 h-6 text-[#009BFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg>
+                )}
+                {useCase.icon === 'building' && (
+                  <svg class="w-6 h-6 text-[#009BFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0H5m14 0h2m-16 0H3"></path></svg>
+                )}
+                {useCase.icon === 'zap' && (
+                  <svg class="w-6 h-6 text-[#009BFF]" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+                )}
+              </div>
+              <h3 class="text-[#0C2340] mb-2" style="font-size: 1.125rem; font-weight: 600;">{useCase.title}</h3>
+              <p class="text-[#5A6A7E]" style="font-size: 0.875rem; line-height: 1.7;">{useCase.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
 
-      {/* FAQs */}
-      {solution.faqs && solution.faqs.length > 0 && (
-        <div>
-          <h2 class="text-[#0C2340] mb-6" style="font-size: 1.5rem; font-weight: 700;">Frequently Asked Questions</h2>
-          <div class="space-y-4">
-            {solution.faqs.map((faq) => (
-              <details class="group bg-[#F5F7FA] rounded-xl">
-                <summary class="flex items-center justify-between cursor-pointer px-6 py-5 text-[#0C2340] list-none" style="font-size: 1rem; font-weight: 600;">
-                  {faq.question}
-                  <svg class="w-5 h-5 shrink-0 ml-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 9l-7 7-7-7"></path></svg>
-                </summary>
-                <div class="px-6 pb-5">
-                  <p class="text-[#5A6A7E]" style="font-size: 0.9375rem; line-height: 1.7;">{faq.answer}</p>
-                </div>
-              </details>
-            ))}
-          </div>
+  {/* ─── Topology Diagrams ────────────────────────────────── */}
+  {solution.topologyDiagrams && solution.topologyDiagrams.length > 0 && (
+    <section class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-[#0C2340] mb-4" style="font-size: 2rem; font-weight: 700;">System Architecture</h2>
+          <p class="text-[#5A6A7E] max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+            See how each solution tier is designed and connected.
+          </p>
         </div>
-      )}
+        <div class="space-y-12">
+          {solution.topologyDiagrams.map((diagram) => (
+            <div class="bg-[#F5F7FA] rounded-2xl p-6 md:p-8">
+              <h3 class="text-[#0C2340] mb-2" style="font-size: 1.25rem; font-weight: 600;">{diagram.title}</h3>
+              {diagram.description && (
+                <p class="text-[#5A6A7E] mb-6" style="font-size: 0.9375rem;">{diagram.description}</p>
+              )}
+              <img
+                src={diagram.image}
+                alt={diagram.title}
+                class="w-full rounded-xl"
+                loading="lazy"
+                decoding="async"
+              />
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Features ─────────────────────────────────────────── */}
+  {solution.features.length > 0 && (
+    <section class="py-16 bg-[#F5F7FA]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-[#0C2340] mb-6" style="font-size: 1.5rem; font-weight: 700;">Key Features</h2>
+        <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {solution.features.map((feature) => (
+            <li class="flex items-start gap-3 bg-white rounded-xl p-4">
+              <svg class="w-5 h-5 text-[#27AE60] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-[#5A6A7E]" style="font-size: 0.9375rem;">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Related Products ─────────────────────────────────── */}
+  {solution.relatedProducts && solution.relatedProducts.length > 0 && (
+    <section class="py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="text-center mb-12">
+          <h2 class="text-[#0C2340] mb-4" style="font-size: 2rem; font-weight: 700;">Related Products</h2>
+          <p class="text-[#5A6A7E] max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+            Explore the products that power this solution.
+          </p>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {solution.relatedProducts.map((product) => (
+            <a
+              href={`/products/${product.slug}`}
+              class="group bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-gray-100"
+            >
+              <div class="aspect-square bg-[#F5F7FA] p-6 flex items-center justify-center">
+                <img
+                  src={product.image}
+                  alt={product.name}
+                  class="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                  decoding="async"
+                />
+              </div>
+              <div class="p-5">
+                <span class="text-[#009BFF]" style="font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em;">
+                  {product.category}
+                </span>
+                <h3 class="text-[#0C2340] mt-1 group-hover:text-[#009BFF] transition-colors" style="font-size: 1rem; font-weight: 600;">
+                  {product.name}
+                </h3>
+                {product.description && (
+                  <p class="text-[#5A6A7E] mt-2 line-clamp-2" style="font-size: 0.875rem; line-height: 1.6;">
+                    {product.description}
+                  </p>
+                )}
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Benefits ─────────────────────────────────────────── */}
+  {solution.benefits.length > 0 && (
+    <section class="py-16 bg-[#0C2340]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-white mb-8 text-center" style="font-size: 1.5rem; font-weight: 700;">Why Choose This Solution</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {solution.benefits.map((benefit) => (
+            <div class="flex items-start gap-3 bg-white/5 rounded-xl p-4 border border-white/10">
+              <svg class="w-5 h-5 text-[#009BFF] shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+              <span class="text-white/80" style="font-size: 0.9375rem;">{benefit}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── Ideal For ────────────────────────────────────────── */}
+  {solution.idealFor && solution.idealFor.length > 0 && (
+    <section class="py-16">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-[#0C2340] mb-6 text-center" style="font-size: 1.5rem; font-weight: 700;">Ideal For</h2>
+        <div class="flex flex-wrap justify-center gap-3">
+          {solution.idealFor.map((item) => (
+            <span class="px-4 py-2 rounded-full bg-[#E6F3FF] text-[#0C2340]" style="font-size: 0.875rem; font-weight: 500;">
+              {item}
+            </span>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── FAQs ─────────────────────────────────────────────── */}
+  {solution.faqs && solution.faqs.length > 0 && (
+    <section class="py-16 bg-[#F5F7FA]">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <h2 class="text-[#0C2340] mb-8 text-center" style="font-size: 1.5rem; font-weight: 700;">Frequently Asked Questions</h2>
+        <div class="space-y-4">
+          {solution.faqs.map((faq) => (
+            <details class="group bg-white rounded-xl shadow-sm">
+              <summary class="flex items-center justify-between cursor-pointer px-6 py-5 text-[#0C2340] list-none" style="font-size: 1rem; font-weight: 600;">
+                {faq.question}
+                <svg class="w-5 h-5 shrink-0 ml-4 transition-transform group-open:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2"><path d="M19 9l-7 7-7-7"></path></svg>
+              </summary>
+              <div class="px-6 pb-5">
+                <p class="text-[#5A6A7E]" style="font-size: 0.9375rem; line-height: 1.7;">{faq.answer}</p>
+              </div>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  )}
+
+  {/* ─── CTA ──────────────────────────────────────────────── */}
+  <section class="py-16 bg-[#009BFF]">
+    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-white mb-4" style="font-size: 1.75rem; font-weight: 700;">
+        {solution.ctaTitle || `Ready to Deploy ${solution.title}?`}
+      </h2>
+      <p class="text-white/90 mb-8 max-w-2xl mx-auto" style="font-size: 1.0625rem; line-height: 1.7;">
+        {solution.ctaDescription || 'Contact our team of experts to design the perfect solution for your needs.'}
+      </p>
+      <div class="flex flex-col sm:flex-row justify-center gap-4">
+        <a
+          href="/contact/quote-request"
+          class="inline-flex items-center justify-center bg-white text-[#009BFF] hover:bg-gray-100 px-8 py-3.5 rounded-lg transition-colors"
+          style="font-size: 1rem; font-weight: 600;"
+        >
+          Request a Quote
+        </a>
+        <a
+          href="/contact"
+          class="inline-flex items-center justify-center bg-white/10 hover:bg-white/20 text-white border border-white/30 px-8 py-3.5 rounded-lg transition-colors"
+          style="font-size: 1rem; font-weight: 600;"
+        >
+          Talk with an Expert
+        </a>
+      </div>
     </div>
   </section>
 </BaseLayout>
