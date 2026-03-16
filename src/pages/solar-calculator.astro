@@ -1,0 +1,206 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { companyInfo } from '../lib/mockData';
+import { buildBreadcrumbSchema, buildFAQSchema } from '../lib/schema';
+import SolarCalculator from '../components/SolarCalculator.tsx';
+
+const faqs = [
+  {
+    question: 'How accurate is this solar savings calculator?',
+    answer: 'This calculator provides a reliable estimate based on average solar irradiance data for each South African province, standard commercial tariff rates, and typical C&I system performance. Actual savings may vary by 10–15% depending on roof orientation, shading, and site-specific conditions. For a precise proposal, request a free site assessment from our engineering team.',
+  },
+  {
+    question: 'What is the typical payback period for commercial solar in South Africa?',
+    answer: 'Most commercial and industrial solar installations in South Africa achieve payback within 3–5 years, depending on your electricity tariff, location, and system size. With annual Eskom tariff increases averaging 10%+, the payback period continues to shorten year on year.',
+  },
+  {
+    question: 'Do I need battery storage with my solar system?',
+    answer: 'For C&I operations that primarily run during daytime hours, batteries are not essential — your solar system generates power when you need it most. However, battery storage can be valuable for load-shedding protection, demand charge management, and extending solar usage into evening hours. Our team can advise on the optimal configuration for your business.',
+  },
+  {
+    question: 'How much roof space do I need for a commercial solar installation?',
+    answer: 'As a rule of thumb, you need approximately 6 m² of unshaded roof space per kWp of solar capacity. A 100 kWp system, for example, requires around 600 m² of roof area. Our engineers conduct a detailed roof survey to maximise panel placement and energy yield.',
+  },
+  {
+    question: 'What financing options are available for commercial solar?',
+    answer: 'Livoltek offers multiple financing structures including outright purchase, Power Purchase Agreements (PPAs) where you pay only for the electricity generated, and solar rental/lease arrangements with zero upfront capital. Section 12B of the Income Tax Act also allows 125% accelerated depreciation on solar assets in year one.',
+  },
+];
+
+const jsonLd = [
+  buildBreadcrumbSchema([
+    { name: 'Home', url: `${companyInfo.url}/` },
+    { name: 'Solar Savings Calculator', url: `${companyInfo.url}/solar-calculator` },
+  ]),
+  buildFAQSchema(faqs),
+];
+---
+
+<BaseLayout
+  title="Solar Savings Calculator — Estimate Your ROI | Livoltek Africa"
+  description="Calculate your commercial solar savings in 30 seconds. Enter your monthly electricity bill or system size to see payback period, 25-year savings, and CO2 reduction."
+  keywords="solar calculator, solar savings South Africa, commercial solar ROI, solar payback period, solar investment calculator"
+  canonicalPath="/solar-calculator"
+  jsonLd={jsonLd}
+>
+
+  <!-- Hero Section -->
+  <section class="relative overflow-hidden py-16 md:py-24" style="background: linear-gradient(135deg, #0C2340 0%, #091A2E 100%)">
+    <div class="absolute inset-0 opacity-10" style="background-image: radial-gradient(circle at 20% 50%, #009BFF 0%, transparent 50%), radial-gradient(circle at 80% 50%, #27AE60 0%, transparent 50%)"></div>
+    <div class="relative max-w-4xl mx-auto px-4 text-center">
+      <span class="inline-flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium mb-6" style="background-color: rgba(0, 155, 255, 0.15); color: #009BFF">
+        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"></path></svg>
+        Free Instant Estimate
+      </span>
+      <h1 class="text-3xl md:text-5xl font-extrabold text-white mb-4 leading-tight">
+        How Much Can Solar Save <br class="hidden md:block" />Your Business?
+      </h1>
+      <p class="text-lg md:text-xl max-w-2xl mx-auto" style="color: rgba(255, 255, 255, 0.7)">
+        Enter your monthly electricity bill or desired system size and see your estimated savings, payback period, and environmental impact in seconds.
+      </p>
+    </div>
+  </section>
+
+  <!-- Calculator Section -->
+  <section class="py-12 md:py-20" style="background-color: #F5F7FA">
+    <div class="max-w-5xl mx-auto px-4">
+      <SolarCalculator client:visible />
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="py-16 md:py-20 bg-white">
+    <div class="max-w-5xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-12" style="color: #0C2340">
+        How It Works
+      </h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        {[
+          {
+            step: '1',
+            title: 'Enter Your Details',
+            description: 'Input your monthly electricity bill or desired system size, select your province and tariff type.',
+            icon: 'M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z',
+          },
+          {
+            step: '2',
+            title: 'See Your Savings',
+            description: 'Instantly view your estimated monthly savings, payback period, 25-year returns, and CO₂ reduction.',
+            icon: 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z',
+          },
+          {
+            step: '3',
+            title: 'Get a Quote',
+            description: 'Ready to go solar? Request a free, detailed proposal from our engineering team — no obligation.',
+            icon: 'M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z',
+          },
+        ].map((item) => (
+          <div class="text-center">
+            <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl mb-4" style="background-color: #E6F3FF">
+              <svg class="w-7 h-7" style="color: #009BFF" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={item.icon}></path>
+              </svg>
+            </div>
+            <div class="inline-flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold text-white mb-3" style="background-color: #009BFF">
+              {item.step}
+            </div>
+            <h3 class="text-lg font-bold mb-2" style="color: #0C2340">{item.title}</h3>
+            <p class="text-sm leading-relaxed" style="color: #5A6A7E">{item.description}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Assumptions & Methodology -->
+  <section class="py-16 md:py-20" style="background-color: #F5F7FA">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-8" style="color: #0C2340">
+        Assumptions & Methodology
+      </h2>
+      <div class="rounded-2xl bg-white p-6 md:p-8 shadow-sm border border-gray-100">
+        <details class="group">
+          <summary class="cursor-pointer list-none flex items-center justify-between font-semibold text-base" style="color: #0C2340">
+            <span>View calculation methodology and data sources</span>
+            <svg class="w-5 h-5 transition-transform group-open:rotate-180" style="color: #009BFF" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </summary>
+          <div class="mt-6 space-y-4 text-sm leading-relaxed" style="color: #5A6A7E">
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">Solar Irradiance Data</h4>
+              <p>Province-level annual solar yields (kWh/kWp) are based on GHI data from the South African Department of Mineral Resources and Energy's Solar Radiation Data Handbook, validated against PVSyst modelling for typical C&I installations. Values range from 1,550 kWh/kWp (KwaZulu-Natal) to 2,000 kWh/kWp (Northern Cape).</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">Performance Ratio</h4>
+              <p>A performance ratio (PR) of 80% is applied, accounting for inverter losses, wiring, temperature derating, soiling, and mismatch. This is conservative for well-maintained C&I rooftop systems.</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">Tariff Rates</h4>
+              <p>Eskom Direct rate (R2.20/kWh) reflects the 2024/25 Megaflex average. Municipal rate (R3.10/kWh) is a blended average across major metros. Actual rates vary by time-of-use period, demand charges, and municipality.</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">Tariff Escalation</h4>
+              <p>10% annual escalation is based on Eskom's historical average increase over the past decade. NERSA-approved increases have ranged from 8% to 18% annually.</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">System Cost</h4>
+              <p>R14,000/kWp is a representative turnkey installed cost for C&I rooftop systems (50–500 kWp range) including modules, inverters, mounting, cabling, and installation. Actual pricing depends on system size, roof type, and complexity.</p>
+            </div>
+            <div>
+              <h4 class="font-semibold mb-1" style="color: #0C2340">Self-Consumption & Degradation</h4>
+              <p>85% self-consumption ratio assumes typical C&I daytime operations. Panel degradation of 0.5% per year is based on Tier-1 module warranties. CO₂ factor of 1.04 kg/kWh is Eskom's published grid emission factor.</p>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ Section -->
+  <section class="py-16 md:py-20 bg-white">
+    <div class="max-w-3xl mx-auto px-4">
+      <h2 class="text-2xl md:text-3xl font-bold text-center mb-8" style="color: #0C2340">
+        Frequently Asked Questions
+      </h2>
+      <div class="space-y-4">
+        {faqs.map((faq) => (
+          <details class="group rounded-2xl border border-gray-100 bg-white shadow-sm">
+            <summary class="cursor-pointer list-none flex items-center justify-between px-6 py-4 font-semibold text-base" style="color: #0C2340">
+              <span>{faq.question}</span>
+              <svg class="w-5 h-5 flex-shrink-0 ml-4 transition-transform group-open:rotate-180" style="color: #009BFF" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+              </svg>
+            </summary>
+            <div class="px-6 pb-4 text-sm leading-relaxed" style="color: #5A6A7E">
+              {faq.answer}
+            </div>
+          </details>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Bottom CTA -->
+  <section class="py-16 md:py-20" style="background: linear-gradient(135deg, #0C2340 0%, #091A2E 100%)">
+    <div class="max-w-3xl mx-auto px-4 text-center">
+      <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">
+        Ready for an Accurate, Site-Specific Proposal?
+      </h2>
+      <p class="text-lg mb-8" style="color: rgba(255, 255, 255, 0.7)">
+        Our engineering team will conduct a free site assessment and provide a detailed financial model tailored to your business.
+      </p>
+      <a
+        href="/contact/quote-request"
+        class="inline-flex items-center gap-2 rounded-xl px-8 py-4 text-base font-bold text-white transition-all duration-200 hover:opacity-90"
+        style="background-color: #009BFF"
+      >
+        Request a Free Quote
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+        </svg>
+      </a>
+    </div>
+  </section>
+
+</BaseLayout>

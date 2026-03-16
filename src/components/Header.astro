@@ -21,7 +21,15 @@ const navItems = [
   { label: 'Products', href: '/products' },
   { label: 'Solutions', href: '/solutions' },
   { label: 'Insights', href: '/insights' },
-  { label: 'Resources', href: '/resources' },
+  {
+    label: 'Resources',
+    href: '/resources',
+    children: [
+      { label: 'Solar Calculator', href: '/solar-calculator', description: 'Estimate your solar savings' },
+      { label: 'Technical Datasheets', href: '/resources', description: 'Product specs & data' },
+      { label: 'Case Studies', href: '/resources?type=case-study', description: 'Real project results' },
+    ],
+  },
   { label: 'About', href: '/about' },
   { label: 'Contact', href: '/contact' },
 ];
@@ -43,7 +51,50 @@ const currentPath = Astro.url.pathname;
         {navItems.map((item) => {
           const isActive = currentPath === item.href ||
             (item.href !== '/' && currentPath.startsWith(item.href));
-          return (
+
+          return item.children ? (
+            <div class="relative group">
+              <button
+                class:list={[
+                  'flex items-center gap-1 px-4 py-2 rounded-lg transition-colors cursor-pointer',
+                  isActive
+                    ? 'text-[#009BFF] bg-[#E6F3FF]'
+                    : 'text-[#0C2340] hover:text-[#009BFF] hover:bg-[#F5F7FA]',
+                ]}
+                style="font-size: 0.9375rem; font-weight: 500;"
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                {item.label}
+                <svg class="w-3.5 h-3.5 opacity-60 transition-transform group-hover:rotate-180" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+              </button>
+              <div class="absolute top-full left-0 pt-2 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-50">
+                <div class="w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-2">
+                  {item.children.map((child) => {
+                    const childActive = currentPath === child.href;
+                    return (
+                      <a
+                        href={child.href}
+                        class:list={[
+                          'block px-4 py-2.5 transition-colors',
+                          childActive
+                            ? 'text-[#009BFF] bg-[#E6F3FF]'
+                            : 'text-[#0C2340] hover:text-[#009BFF] hover:bg-[#F5F7FA]',
+                        ]}
+                      >
+                        <span class="block text-sm font-medium">{child.label}</span>
+                        {child.description && (
+                          <span class="block text-xs mt-0.5" style="color: #5A6A7E">{child.description}</span>
+                        )}
+                      </a>
+                    );
+                  })}
+                </div>
+              </div>
+            </div>
+          ) : (
             <a
               href={item.href}
               class:list={[

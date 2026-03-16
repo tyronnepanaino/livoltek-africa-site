@@ -70,8 +70,118 @@
         "source": "/sitemap.xml",
         "destination": "/sitemap-index.xml",
         "type": 301
+      },
+
+      {
+        "source": "/solutions/epc",
+        "destination": "/solutions/commercial-rooftop-solar",
+        "type": 301
+      },
+      {
+        "source": "/solutions/commercial-industrial",
+        "destination": "/solutions/commercial-rooftop-solar",
+        "type": 301
+      },
+      {
+        "source": "/solutions/government-municipal",
+        "destination": "/solutions/commercial-rooftop-solar",
+        "type": 301
+      },
+      {
+        "source": "/solutions/residential",
+        "destination": "/solutions/microgrids-off-grid-power",
+        "type": 301
+      },
+      {
+        "source": "/solutions/bess",
+        "destination": "/solutions/industrial-energy-storage",
+        "type": 301
+      },
+      {
+        "source": "/solutions/agriculture",
+        "destination": "/solutions/microgrids-off-grid-power",
+        "type": 301
+      },
+      {
+        "source": "/solutions/microgrid",
+        "destination": "/solutions/microgrids-off-grid-power",
+        "type": 301
+      },
+
+      {
+        "source": "/insights/realistic-industrial-solar-savings",
+        "destination": "/insights/industrial-solar-roi-calculator-real-numbers-from-manufacturing-facilities",
+        "type": 301
+      },
+      {
+        "source": "/insights/livoltek-south-africa-goes-multi-national",
+        "destination": "/about",
+        "type": 301
+      },
+      {
+        "source": "/insights/this-product-is-redefining-commercial-and-municipal-energy-storage-in-africa",
+        "destination": "/solutions/industrial-energy-storage",
+        "type": 301
+      },
+      {
+        "source": "/insights/eswatini-revenue-service-ers-microgrid-epc-project",
+        "destination": "/resources/eswatini-revenue-service-microgrid-solar-bess-ems",
+        "type": 301
+      },
+      {
+        "source": "/insights/faq",
+        "destination": "/contact",
+        "type": 301
+      },
+      {
+        "source": "/quote",
+        "destination": "/contact/quote-request",
+        "type": 301
+      },
+      {
+        "source": "/reveal",
+        "destination": "/",
+        "type": 301
+      },
+      {
+        "source": "/solutions/government",
+        "destination": "/solutions/commercial-rooftop-solar",
+        "type": 301
+      },
+
+      {
+        "source": "/products/bess-125kw-261kwh",
+        "destination": "/products/livoltek-bes-p-125kw261kwh-industrial-bess",
+        "type": 301
+      },
+      {
+        "source": "/products/high-voltage-battery-system",
+        "destination": "/products/livoltek-bhf-g-1560kwh-high-voltage-battery-system",
+        "type": 301
+      },
+      {
+        "source": "/products/single-phase-grid-tied-inverter",
+        "destination": "/products/gt1-710kw-single-phase-grid-tied",
+        "type": 301
+      },
+      {
+        "source": "/products/ipower-residential-all-in-one-ess",
+        "destination": "/products/livoltek-ipower-hes-36kw-hybrid-all-in-one-energy-storage-system",
+        "type": 301
+      },
+      {
+        "source": "/products/three-phase-hybrid-inverter-gen-2",
+        "destination": "/products/livoltek-hp3-512kw-three-phase-hybrid-solar-inverter",
+        "type": 301
+      },
+      {
+        "source": "/products/three-phase-grid-tied-inverter-30kw",
+        "destination": "/products/livoltek-gt3-3060kw-three-phase-commercial-grid-tied-solar-inverter",
+        "type": 301
       }
     ],
+
+    "_www_redirect_note": "WWW redirect: configure in Firebase Console → Hosting → Custom Domains. Set livoltek.africa (non-www) to redirect to www.livoltek.africa. firebase.json does not support host-based redirects.",
 
     "rewrites": [
       {

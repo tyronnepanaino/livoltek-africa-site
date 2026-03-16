@@ -11,11 +11,18 @@
  * is 100% static HTML with zero JS.
  */
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, ChevronDown } from 'lucide-react';
+
+interface NavChild {
+  label: string;
+  href: string;
+  description?: string;
+}
 
 interface NavItem {
   label: string;
   href: string;
+  children?: NavChild[];
 }
 
 interface Props {
@@ -26,6 +33,7 @@ interface Props {
 
 export default function HeaderMobileMenu({ navItems, currentPath, phone }: Props) {
   const [open, setOpen] = useState(false);
+  const [expandedItem, setExpandedItem] = useState<string | null>(null);
 
   // Lock body scroll when menu is open
   useEffect(() => {
@@ -60,6 +68,53 @@ export default function HeaderMobileMenu({ navItems, currentPath, phone }: Props
               {navItems.map((item) => {
                 const isActive = currentPath === item.href ||
                   (item.href !== '/' && currentPath.startsWith(item.href));
+
+                if (item.children) {
+                  const isExpanded = expandedItem === item.label;
+                  return (
+                    <div key={item.label}>
+                      <button
+                        onClick={() => setExpandedItem(isExpanded ? null : item.label)}
+                        className={`flex items-center justify-between w-full px-4 py-3 rounded-lg transition-colors ${
+                          isActive
+                            ? 'text-[#009BFF] bg-[#E6F3FF]'
+                            : 'text-[#0C2340] hover:bg-[#F5F7FA]'
+                        }`}
+                        style={{ fontSize: '1rem', fontWeight: 500 }}
+                      >
+                        {item.label}
+                        <ChevronDown
+                          className={`w-4 h-4 opacity-60 transition-transform ${isExpanded ? 'rotate-180' : ''}`}
+                        />
+                      </button>
+                      {isExpanded && (
+                        <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-100 pl-3">
+                          {item.children.map((child) => (
+                            <a
+                              key={child.href + child.label}
+                              href={child.href}
+                              className={`block px-4 py-2.5 rounded-lg transition-colors ${
+                                currentPath === child.href
+                                  ? 'text-[#009BFF] bg-[#E6F3FF]'
+                                  : 'text-[#0C2340] hover:bg-[#F5F7FA]'
+                              }`}
+                              style={{ fontSize: '0.9375rem', fontWeight: 500 }}
+                              onClick={() => setOpen(false)}
+                            >
+                              {child.label}
+                              {child.description && (
+                                <span className="block text-xs mt-0.5" style={{ color: '#5A6A7E' }}>
+                                  {child.description}
+                                </span>
+                              )}
+                            </a>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  );
+                }
+
                 return (
                   <a
                     key={item.href}
